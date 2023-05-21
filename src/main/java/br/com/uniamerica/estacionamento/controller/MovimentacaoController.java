@@ -25,5 +25,8 @@ public class MovimentacaoController {
             final Movimentacao movimentacao = this.movimentacaoService.findById(id);
             return ResponseEntity.ok("Objeto encontrado ");
         }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body("ERROR");
+        }
     }
 }
