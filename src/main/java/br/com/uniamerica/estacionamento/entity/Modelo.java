@@ -1,6 +1,8 @@
 package br.com.uniamerica.estacionamento.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +18,8 @@ import java.time.LocalDateTime;
 public class Modelo extends AbstratEntity {
     @Getter
     @Setter
+    @NotNull(message = "Campo precisa ser preenchido")
+    @Size(min=8, max=25, message = "Preencha o campo com no minimo 8 caracteres e maximo 25")
     @Column(name = "nome", nullable = false, length = 50, unique = true)
     private String nome;
     @Getter

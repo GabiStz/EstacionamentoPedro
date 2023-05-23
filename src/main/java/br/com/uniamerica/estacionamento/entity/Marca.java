@@ -1,6 +1,8 @@
 package br.com.uniamerica.estacionamento.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +21,8 @@ import java.util.List;
 public class Marca extends AbstratEntity {
     @Getter
     @Setter
+    @NotNull(message = "Campo precisa ser preenchido")
+    @Size(min=3, max=25, message = "Preencha o campo com no minimo 3 caracteres e maximo 25")
     @Column(name = "nome", nullable = false, unique = true, length = 50)
     private String nome;
 

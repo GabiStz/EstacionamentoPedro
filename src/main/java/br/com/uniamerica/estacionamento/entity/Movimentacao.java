@@ -1,6 +1,8 @@
 package br.com.uniamerica.estacionamento.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,15 +17,18 @@ public class Movimentacao extends AbstratEntity {
     @Getter
     @Setter
     @ManyToOne
+    @NotNull(message = "Campo precisa ser preenchido")
     @JoinColumn(name = "veiculo_id",nullable = false)
     private Veiculo veiculo;
     @Getter
     @Setter
     @ManyToOne
+    @NotNull(message = "Campo precisa ser preenchido")
     @JoinColumn(name = "condutor_id",nullable = false)
     private Condutor condutor;
     @Getter
     @Setter
+    @NotNull(message = "Campo precisa ser preenchido")
     @Column(name = "entrada", nullable = false)
 
     private LocalDateTime entrada;
