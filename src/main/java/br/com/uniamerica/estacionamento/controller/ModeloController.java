@@ -1,5 +1,6 @@
 package br.com.uniamerica.estacionamento.controller;
 
+import br.com.uniamerica.estacionamento.entity.Condutor;
 import br.com.uniamerica.estacionamento.entity.Modelo;
 import br.com.uniamerica.estacionamento.repository.ModeloRepository;
 import br.com.uniamerica.estacionamento.service.ModeloService;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping(value = "/api/modelo")
 public class ModeloController {
     @Autowired
@@ -21,17 +22,23 @@ public class ModeloController {
     @GetMapping("/{id}")
     public ResponseEntity<?> findByIdPath(@PathVariable("id")final Long id){
         try {
-            final Modelo modelo = this.modeloService.findByid(id);
+            Modelo modelo = this.modeloService.findByid(id);
             return ResponseEntity.ok().body(modelo);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Nenhum valor Encontrado" + e.getMessage());
         }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body("Nenhum valor encontrado");
-        }
+
 
     }
     @GetMapping("/ListaCompleta")
-    public List<Modelo> listaCompleta(){
-        return modeloService.findAll();
+    public ResponseEntity<?> listaCompleta(){
+        try {
+            return ResponseEntity.ok().body(modeloRepository.findAll());
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body("ERROR" + e.getMessage());
+        }
     }
     @PostMapping
     public ResponseEntity<?>cadastar(@RequestBody final Modelo modelo){
@@ -41,13 +48,11 @@ public class ModeloController {
         }
         catch (Exception e)
         {
-            return ResponseEntity.badRequest().body("ERROR");
+            return ResponseEntity.badRequest().body("ERROR"+ e.getMessage());
 
          }
 
-
-
-        }
+    }
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar ( @PathVariable ("id") final Long id, @RequestBody final Modelo modelo){
         Modelo modeloBanco = this.modeloService.findByid(id);

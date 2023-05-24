@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping(value = "/api/movimentacao")
 public class MovimentacaoController {
     @Autowired
@@ -26,32 +26,23 @@ public class MovimentacaoController {
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable("id") final Long id) {
         try {
-            final Movimentacao movimentacao = this.movimentacaoService.findById(id);
+            Movimentacao movimentacao = movimentacaoService.findById(id);
             return ResponseEntity.ok("Objeto encontrado ");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("ERROR!");
+            return ResponseEntity.badRequest().body("ERROR!" + e.getMessage());
         }
     }
 
     @GetMapping("/ListaCompleta")
-    public List<Movimentacao> listaC() {
-        return this.movimentacaoService.findAll();
-    }
-    @GetMapping("/movimentacao-ativa")
-    public ResponseEntity <?> ativo (){
-
-        List<Movimentacao> movimentacao = this.movimentacaoService.findAll();
-
-        List <Movimentacao> movimentacaoAtivo = new ArrayList<>();
-
-        for (Movimentacao valor: movimentacao) {
-            if (valor.isAtivo())
-            {
-                movimentacaoAtivo.add(valor);
-            }
+    public ResponseEntity<?> listaC() {
+        try {
+            return ResponseEntity.ok().body(movimentacaoService.findAll());
         }
-        return ResponseEntity.ok(movimentacaoAtivo);
+        catch (Exception e){
+            return ResponseEntity.badRequest().body("ERROR" + e.getMessage());
+        }
     }
+
 
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody final Movimentacao movimentacao) {

@@ -16,14 +16,23 @@ public class VeiculoService {
     @Autowired
     private VeiculoRepository veiculoRepository;
     public Veiculo findById(Long id){
-        Optional<Veiculo> veiculo = this.veiculoRepository.findById(id);
-        return veiculo.orElseThrow(()-> new RuntimeException(
-                        "Obejto encontrado:" + Veiculo.class.getName()
-                )
-        );
+        if(id == 0){
+            throw new RuntimeException(", Id informado não localizado!");
+
+        }   else if(veiculoRepository.findById(id).isEmpty()){
+            throw new RuntimeException((", não foi possivel localizar marca informado!"));
+
+        }else {
+            return veiculoRepository.findById(id).orElse(null);
+        }
+
     }
     public List<Veiculo> findAll(){
-        return this.veiculoRepository.findAll();
+        if (veiculoRepository.findAll().isEmpty()){
+            throw new RuntimeException(", banco de dados nao possui condutor cadastrado");
+        }else{
+            return veiculoRepository.findAll();
+        }
     }
     @Transactional
     public void cadastrar (Veiculo veiculo){

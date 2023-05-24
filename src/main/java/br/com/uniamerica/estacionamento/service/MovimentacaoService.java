@@ -16,14 +16,23 @@ public class MovimentacaoService {
     @Autowired
     private MovimentacoRepository movimentacoRepository;
     public Movimentacao findById(Long id){
-        Optional<Movimentacao> movimentacao = this.movimentacoRepository.findById(id);
-        return movimentacao.orElseThrow(()-> new RuntimeException(
-                "Obejto encontrado:" + Movimentacao.class.getName()
-        )
-        );
+        if(id == 0){
+            throw new RuntimeException(", Id informado não localizado!");
+
+        }   else if(movimentacoRepository.findById(id).isEmpty()){
+            throw new RuntimeException((", não foi possivel localizar marca informado!"));
+
+        }else {
+            return movimentacoRepository.findById(id).orElse(null);
+        }
+
     }
     public List<Movimentacao>findAll(){
-        return this.movimentacoRepository.findAll();
+        if (movimentacoRepository.findAll().isEmpty()){
+            throw new RuntimeException(", banco de dados nao possui condutor cadastrado");
+        }else{
+            return movimentacoRepository.findAll();
+        }
     }
     @Transactional
     public void cadastrar (Movimentacao movimentacao){

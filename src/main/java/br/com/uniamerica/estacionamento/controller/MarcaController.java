@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping(value = "/api/marca")
 public class MarcaController {
     @Autowired
@@ -21,41 +21,31 @@ public class MarcaController {
     @GetMapping("/{id}")
     public ResponseEntity<?>FindByIdPath(@PathVariable ("id") final Long id){
         try{
-            Marca marca = this.marcaService.findById(id);
+            Marca marca = marcaService.findById(id);
             return ResponseEntity.ok().body("Marca encontrada com Sucesso");
         }
         catch (Exception e){
-            return ResponseEntity.badRequest().body("Marca nao encontrada");
+            return ResponseEntity.badRequest().body("Error" + e.getMessage());
         }
     }
     @GetMapping("/ListaCompleta")
-    public List<Marca> ListaComplesta(){
-        return marcaService.findAll();
+    public ResponseEntity<?> ListaComplesta(){
+        try{
+            return ResponseEntity.ok().body(marcaRepository.findAll());
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body("Error" + e.getMessage());
+        }
     }
 
-    @GetMapping("/marca-ativa")
-    public ResponseEntity <?> ativo (){
-
-            List<Marca> marca = this.marcaService.findAll();
-
-            List <Marca> marcaAtiva = new ArrayList<>();
-
-              for (Marca valor: marca) {
-                  if (valor.isAtivo())
-                 {
-                marcaAtiva.add(valor);
-                 }
-         }
-             return ResponseEntity.ok(marcaAtiva);
-    }
-    @PostMapping("/{id}")
+    @PostMapping
     public ResponseEntity<?> cadastrar (@RequestBody final Marca marca){
         try {
             this.marcaService.cadastra(marca);
             return ResponseEntity.ok("Cadastrado com sucesso");
         }
         catch (Exception e){
-            return ResponseEntity.badRequest().body("ERROR");
+            return ResponseEntity.badRequest().body("ERROR" + e.getMessage());
         }
 
     }

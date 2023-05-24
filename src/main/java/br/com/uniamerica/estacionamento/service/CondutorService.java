@@ -14,15 +14,24 @@ public class CondutorService {
         @Autowired
              private CondutorRepository condutorRepository;
                  public Condutor findById(long id){
-                    Optional<Condutor> condutor= this.condutorRepository.findById(id);
-                 return condutor.orElseThrow(()-> new RuntimeException(
-                    "Condutor Encontrado:" + Condutor.class.getName()
-                    )
-                );
+                     if(id == 0){
+                         throw new RuntimeException(", Id informado não localizado!");
+
+                     }   else if(condutorRepository.findById(id).isEmpty()){
+                         throw new RuntimeException((", não foi possivel localizar marca informado!"));
+
+                     }else {
+                         return condutorRepository.findById(id).orElse(null);
+                     }
+
         }
 
             public List<Condutor>findAll(){
-            return this.condutorRepository.findAll();
+                if (condutorRepository.findAll().isEmpty()){
+                    throw new RuntimeException(", banco de dados nao possui condutor cadastrado");
+                }else{
+                    return condutorRepository.findAll();
+                }
        }
        @Transactional
             public void cadastrar (Condutor condutor){

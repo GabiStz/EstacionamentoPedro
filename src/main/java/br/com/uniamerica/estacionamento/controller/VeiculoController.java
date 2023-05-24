@@ -24,32 +24,23 @@ public class VeiculoController {
     @GetMapping("/{id}")
     public ResponseEntity<?>findByPath(@PathVariable ("id") final Long id){
         try {
-            final Veiculo veiculo = this.veiculoService.findById(id);
-            return ResponseEntity.ok().body("Obejto encontrado");
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body("ERROR");
+            Veiculo veiculo = veiculoService.findById(id);
+            return ResponseEntity.ok().body(veiculo);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Nenhum valor Encontrado" + e.getMessage());
         }
     }
     @GetMapping("/ListaCompleta")
-    public List<Veiculo> listacompleta() {
-        return veiculoService.findAll();
-    }
-    @GetMapping("/veiculo-ativa")
-    public ResponseEntity <?> ativo (){
-
-        List<Veiculo> veiculo = this.veiculoService.findAll();
-
-        List <Veiculo> veiculoAtivo = new ArrayList<>();
-
-        for (Veiculo valor: veiculo) {
-            if (valor.isAtivo())
-            {
-                veiculoAtivo.add(valor);
-            }
+    public ResponseEntity<?> listacompleta() {
+        try {
+            return ResponseEntity.ok().body(veiculoService.findAll());
         }
-        return ResponseEntity.ok(veiculoAtivo);
+        catch (Exception e){
+            return ResponseEntity.badRequest().body("ERROR" + e.getMessage());
+        }
     }
+
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody Veiculo veiculo){
         try{
@@ -57,7 +48,7 @@ public class VeiculoController {
             return ResponseEntity.ok().body("Veiculo Cadastrado");
         }
         catch (Exception e){
-            return ResponseEntity.badRequest().body("ERROR");
+            return ResponseEntity.badRequest().body("ERROR" + e.getMessage());
         }
     }
     @PutMapping("/{id}")

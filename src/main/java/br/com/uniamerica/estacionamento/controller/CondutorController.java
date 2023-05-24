@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping(value = "/api/condutor")
 
 public class CondutorController {
@@ -24,34 +24,24 @@ public class CondutorController {
     @GetMapping("/{id}")
     public ResponseEntity<?> findByIdPath(@PathVariable("id") final Long id) {
         try {
-            final Condutor condutor = this.condutorService.findById(id);
+            Condutor condutor = condutorService.findById(id);
             return ResponseEntity.ok().body(condutor);
 
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Nenhum valor Encontrado");
+            return ResponseEntity.badRequest().body("Nenhum valor Encontrado" + e.getMessage());
         }
 
     }
 
     @GetMapping("/ListaCompleta")
-    public List<Condutor> listacompleta() {
-        return condutorService.findAll();
-    }
-    @GetMapping("/condutor-ativa")
-    public ResponseEntity <?> ativo (){
-
-        List<Condutor> condutors = this.condutorService.findAll();
-
-        List <Condutor> condutorAtiva = new ArrayList<>();
-
-        for (Condutor valor: condutors) {
-            if (valor.isAtivo())
-            {
-                condutorAtiva.add(valor);
-            }
+    public ResponseEntity<?> listacompleta() {
+        try {
+            return ResponseEntity.ok().body(condutorRepository.findAll());
         }
-        return ResponseEntity.ok(condutorAtiva);
-}
+        catch (Exception e){
+            return ResponseEntity.badRequest().body("ERROR" + e.getMessage());
+        }
+    }
 
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody final Condutor condutor) {
@@ -59,7 +49,7 @@ public class CondutorController {
             this.condutorService.cadastrar(condutor);
             return ResponseEntity.ok("Cadastrado com sucesso");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("ERROR");
+            return ResponseEntity.badRequest().body("ERROR" + e.getMessage());
         }
     }
 

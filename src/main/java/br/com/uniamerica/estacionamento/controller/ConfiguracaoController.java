@@ -18,11 +18,20 @@ public class ConfiguracaoController {
     @GetMapping("/{id}")
     public ResponseEntity<?>findByIdPath(@PathVariable("id") final Long id){
         try {
-           final Configuracao configuracao = this.configuracaoService.findById(id);
+           Configuracao configuracao = this.configuracaoService.findById(id);
            return ResponseEntity.ok().body(configuracao);
         }
         catch (Exception e){
             return ResponseEntity.badRequest().body("Nenhum valor encontrado");
+        }
+    }
+    @GetMapping("/ListaCompleta")
+    public ResponseEntity<?> listacompleta() {
+        try {
+            return ResponseEntity.ok().body(configuracaoRepository.findAll());
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body("ERROR" + e.getMessage());
         }
     }
     @PostMapping
@@ -32,7 +41,7 @@ public class ConfiguracaoController {
             return ResponseEntity.ok("Cadastrado com Sucesso");
         }
         catch (Exception e){
-            return ResponseEntity.badRequest().body("ERROR");
+            return ResponseEntity.badRequest().body("ERROR" + e.getMessage());
         }
     }
 

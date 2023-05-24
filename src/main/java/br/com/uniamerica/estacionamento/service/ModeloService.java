@@ -13,14 +13,22 @@ import java.util.Optional;
 public class ModeloService {
     private ModeloRepository modeloRepository;
     public Modelo findByid(final Long id){
-        Optional<Modelo> modelo = this.modeloRepository.findById(id);
-        return modelo.orElseThrow(()-> new RuntimeException(
-                "Modelo encontrado:" + Modelo.class.getName()
-        )
-        );
+        if(id == 0){
+            throw new RuntimeException(", Id informado não localizado!");
+
+        }   else if(modeloRepository.findById(id).isEmpty()){
+            throw new RuntimeException((", não foi possivel localizar modelo informado!"));
+
+        }else {
+            return modeloRepository.findById(id).orElse(null);
+        }
     }
     public List<Modelo> findAll(){
-        return this.modeloRepository.findAll();
+        if (modeloRepository.findAll().isEmpty()){
+            throw new RuntimeException(", banco de dados nao possui condutor cadastrado");
+        }else{
+            return modeloRepository.findAll();
+        }
     }
  @Transactional
  public void cadastrar(Modelo modelo){

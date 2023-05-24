@@ -15,18 +15,32 @@ public class MarcaService {
     @Autowired
     private MarcaRepository marcaRepository;
     public Marca findById(Long id){
-        Optional<Marca> marca = this.marcaRepository.findById(id);
-        return marca.orElseThrow(()-> new RuntimeException(
-                "Marca encontrada:" + Marca.class.getName()
-        )
-        );
+
+        if(id == 0){
+            throw new RuntimeException(", Id informado não localizado!");
+
+        }   else if(marcaRepository.findById(id).isEmpty()){
+            throw new RuntimeException((", não foi possivel localizar marca informado!"));
+
+        }else {
+            return marcaRepository.findById(id).orElse(null);
+        }
+
+
+
+
     }
     public List<Marca>findAll(){
-        return this.marcaRepository.findAll();
+        if (marcaRepository.findAll().isEmpty()){
+            throw new RuntimeException(", banco de dados nao possui marca cadastrada");
+        }else{
+            return marcaRepository.findAll();
+        }
     }
     @Transactional
     public void cadastra (Marca marca){
-        this.marcaRepository.save(marca);
+
+
     }
     @Transactional
     public void delete(Marca marca){
