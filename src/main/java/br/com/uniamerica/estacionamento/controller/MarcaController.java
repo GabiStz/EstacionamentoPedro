@@ -1,81 +1,83 @@
-package br.com.uniamerica.estacionamento.controller;
+package br.com.uniamerica.Estacionamentopedro.controller;
 
-import br.com.uniamerica.estacionamento.entity.Marca;
-import br.com.uniamerica.estacionamento.repository.MarcaRepository;
-import br.com.uniamerica.estacionamento.service.MarcaService;
+import br.com.uniamerica.Estacionamentopedro.entity.Marca;
+import br.com.uniamerica.Estacionamentopedro.entity.Veiculo;
+import br.com.uniamerica.Estacionamentopedro.service.MarcaService;
+import br.com.uniamerica.Estacionamentopedro.service.VeiculoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @RestController
-@RequestMapping(value = "/api/marca")
+@RequestMapping(value = "api/marcas")
 public class MarcaController {
     @Autowired
-    private MarcaRepository marcaRepository;
-    @Autowired
     private MarcaService marcaService;
+
     @GetMapping("/{id}")
-    public ResponseEntity<?>FindByIdPath(@PathVariable ("id") final Long id){
-        try{
-            Marca marca = marcaService.findById(id);
-            return ResponseEntity.ok().body("Marca encontrada com Sucesso");
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body("Error" + e.getMessage());
-        }
+    public ResponseEntity<?> findById(@PathVariable("id") final Long id){
+        final Marca marca = this.marcaService.findById(id);
+        return marca == null
+                ? ResponseEntity.badRequest().body("Nenhum valor encontrado.")
+                : ResponseEntity.ok(marca);
     }
-    @GetMapping("/ListaCompleta")
-    public ResponseEntity<?> ListaComplesta(){
-        try{
-            return ResponseEntity.ok().body(marcaRepository.findAll());
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body("Error" + e.getMessage());
-        }
+
+    @GetMapping("/lista")
+    public ResponseEntity<?> listaCompleta(){
+        return ResponseEntity.ok(this.marcaService.listaCompleta());
+    }
+
+    @GetMapping("/lista/ativos")
+    public ResponseEntity<?> listaAtivos(){
+        return ResponseEntity.ok(this.marcaService.listaMarcasAtivos());
     }
 
     @PostMapping
-    public ResponseEntity<?> cadastrar (@RequestBody final Marca marca){
+    public ResponseEntity<?> cadastrar(@RequestBody final Marca marca){
         try {
-            this.marcaService.cadastra(marca);
-            return ResponseEntity.ok("Cadastrado com sucesso");
+            return ResponseEntity.ok(marcaService.cadastrar(marca));
         }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body("ERROR" + e.getMessage());
-        }
-
-    }
-    @PutMapping("/{id}")
-    public ResponseEntity<?>atualizar(@PathVariable("id")final Long id, @RequestBody Marca marca){
-        Marca marcaBanco = this.marcaService.findById(id);
-        marcaBanco.setNome(marcaBanco.getNome());
-        marcaBanco.setAtivo(marcaBanco.isAtivo());
-        marcaBanco.setCadastro(marcaBanco.getCadastro());
-        marcaBanco.setEdicao(marcaBanco.getEdicao());
-        try {
-            this.marcaService.atualizar(marcaBanco);
-            return ResponseEntity.ok("Atualizado com sucesso");
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body("ERROR");
+        catch (DataIntegrityViolationException e){
+            return ResponseEntity.internalServerError()
+                    .body("Error: " + e.getCause().getCause().getMessage());
         }
     }
-    @DeleteMapping
-    public ResponseEntity<?>delete(@PathVariable("id")final Long id){
-        Marca marcaBanco = this.marcaService.findById(id);
-        try {
-            this.marcaService.delete(marcaBanco);
-            return ResponseEntity.ok("Deletado com sucesso");
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body(("Error ao deletar"));
-        }
 
+    @PutMapping("/{idMarca}")
+    public ResponseEntity<?> atualizar(
+            @PathVariable Long idMarca,
+            @RequestBody Marca marca
+    ) {
+        try {
+            this.marcaService.atualizar(idMarca, marca);
+            return ResponseEntity.ok().body("Marca atualizada com sucesso!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
+    @PutMapping("/desativar/{idMarca}")
+    public ResponseEntity<?> desativar(
+            @PathVariable Long idMarca
+    ){
+        try{
+            this.marcaService.desativar(idMarca);
+            return ResponseEntity.ok().body("Marca desativada com sucesso!");
+        }catch (RuntimeException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
+    @PutMapping("/ativar/{idMarca}")
+    public ResponseEntity<?> ativar(
+            @PathVariable Long idMarca
+    ){
+        try{
+            this.marcaService.ativar(idMarca);
+            return ResponseEntity.ok().body("Marca ativada com sucesso!");
+        }catch (RuntimeException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
