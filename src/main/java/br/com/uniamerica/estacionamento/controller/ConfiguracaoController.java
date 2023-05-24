@@ -1,70 +1,50 @@
-package br.com.uniamerica.estacionamento.controller;
+package br.com.uniamerica.Estacionamentopedro.controller;
 
-import br.com.uniamerica.estacionamento.entity.Configuracao;
-import br.com.uniamerica.estacionamento.repository.ConfiguracaoRepository;
-import br.com.uniamerica.estacionamento.service.ConfiguracaoService;
+import br.com.uniamerica.Estacionamentopedro.entity.Configuracao;
+import br.com.uniamerica.Estacionamentopedro.entity.Veiculo;
+import br.com.uniamerica.Estacionamentopedro.service.ConfiguracaoService;
+import br.com.uniamerica.Estacionamentopedro.service.VeiculoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/api/configuracao")
+@RequestMapping(value = "api/configuracao")
 public class ConfiguracaoController {
+
     @Autowired
-     private ConfiguracaoRepository configuracaoRepository;
-    @Autowired
-     private ConfiguracaoService configuracaoService;
+    private ConfiguracaoService configuracaoService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?>findByIdPath(@PathVariable("id") final Long id){
-        try {
-           Configuracao configuracao = this.configuracaoService.findById(id);
-           return ResponseEntity.ok().body(configuracao);
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body("Nenhum valor encontrado");
-        }
+    public ResponseEntity<?> findById(@PathVariable("id") final Long id){
+        final Configuracao configuracao = this.configuracaoService.findById(id);
+        return configuracao == null
+                ? ResponseEntity.badRequest().body("Nenhum valor encontrado.")
+                : ResponseEntity.ok(configuracao);
     }
-    @GetMapping("/ListaCompleta")
-    public ResponseEntity<?> listacompleta() {
-        try {
-            return ResponseEntity.ok().body(configuracaoRepository.findAll());
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body("ERROR" + e.getMessage());
-        }
-    }
+
     @PostMapping
-    public ResponseEntity<?>cadastrar(@RequestBody final Configuracao configuracao){
+    public ResponseEntity<?> cadastrar(@RequestBody final Configuracao configuracao){
         try {
-            this.configuracaoService.cadastar(configuracao);
-            return ResponseEntity.ok("Cadastrado com Sucesso");
+            return ResponseEntity.ok(configuracaoService.cadastrar(configuracao));
         }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body("ERROR" + e.getMessage());
+        catch (DataIntegrityViolationException e){
+            return ResponseEntity.internalServerError()
+                    .body("Error: " + e.getCause().getCause().getMessage());
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?>atualizar(@PathVariable ("id") final Long id, @RequestBody Configuracao configuracao){
-        Configuracao configuracaoBanco= this.configuracaoService.findById(id);
-        configuracaoBanco.setFimExpediente(configuracaoBanco.getFimExpediente());
-        configuracaoBanco.setGerarDesconto(configuracaoBanco.isGerarDesconto());
-        configuracaoBanco.setVagasMoto(configuracaoBanco.getVagasMoto());
-        configuracaoBanco.setVagasCarro(configuracaoBanco.getVagasCarro());
-        configuracaoBanco.setVagasVan(configuracaoBanco.getVagasVan());
-        configuracaoBanco.setValorHora(configuracaoBanco.getValorHora());
-        configuracaoBanco.setValorMinutoMulta(configuracaoBanco.getValorMinutoMulta());
-        configuracaoBanco.setTempoParaDesconto(configuracaoBanco.getTempoParaDesconto());
-        configuracaoBanco.setTempoDeDesconto(configuracaoBanco.getTempoDeDesconto());
-        try{
-            this.configuracaoService.atualizar(configuracaoBanco);
-            return ResponseEntity.ok("Atualizado com Sucesso");
+    @PutMapping("/{idConfiguracao}")
+    public ResponseEntity<?> atualizar(
+            @PathVariable Long idConfiguracao,
+            @RequestBody Configuracao configuracao
+    ) {
+        try {
+            this.configuracaoService.atualizar(idConfiguracao, configuracao);
+            return ResponseEntity.ok().body("Configuracao atualizada com sucesso!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body("ERROR");
-        }
-
     }
-
 }
