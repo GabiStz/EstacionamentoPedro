@@ -1,83 +1,84 @@
-package br.com.uniamerica.estacionamento.controller;
+package br.com.uniamerica.Estacionamentopedro.controller;
 
-import br.com.uniamerica.estacionamento.entity.Condutor;
-import br.com.uniamerica.estacionamento.entity.Modelo;
-import br.com.uniamerica.estacionamento.repository.ModeloRepository;
-import br.com.uniamerica.estacionamento.service.ModeloService;
+
+import br.com.uniamerica.Estacionamentopedro.entity.Marca;
+import br.com.uniamerica.Estacionamentopedro.entity.Modelo;
+import br.com.uniamerica.Estacionamentopedro.service.MarcaService;
+import br.com.uniamerica.Estacionamentopedro.service.ModeloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping(value = "/api/modelo")
+@RequestMapping(value = "api/modelos")
 public class ModeloController {
     @Autowired
-    private ModeloRepository modeloRepository;
-    @Autowired
     private ModeloService modeloService;
+
     @GetMapping("/{id}")
-    public ResponseEntity<?> findByIdPath(@PathVariable("id")final Long id){
-        try {
-            Modelo modelo = this.modeloService.findByid(id);
-            return ResponseEntity.ok().body(modelo);
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Nenhum valor Encontrado" + e.getMessage());
-        }
-
-
+    public ResponseEntity<?> findById(@PathVariable("id") final Long id){
+        final Modelo modelo = this.modeloService.findById(id);
+        return modelo == null
+                ? ResponseEntity.badRequest().body("Nenhum valor encontrado.")
+                : ResponseEntity.ok(modelo);
     }
-    @GetMapping("/ListaCompleta")
+
+    @GetMapping("/lista")
     public ResponseEntity<?> listaCompleta(){
-        try {
-            return ResponseEntity.ok().body(modeloRepository.findAll());
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body("ERROR" + e.getMessage());
-        }
+        return ResponseEntity.ok(this.modeloService.listaCompleta());
     }
+
+    @GetMapping("/lista/ativos")
+    public ResponseEntity<?> listaAtivos(){
+        return ResponseEntity.ok(this.modeloService.listaModelosAtivos());
+    }
+
     @PostMapping
-    public ResponseEntity<?>cadastar(@RequestBody final Modelo modelo){
-        try{
-            this.modeloService.cadastrar(modelo);
-            return ResponseEntity.ok("Cadastro realizado com sucesso!!");
+    public ResponseEntity<?> cadastrar(@RequestBody final Modelo modelo){
+        try {
+            return ResponseEntity.ok(modeloService.cadastrar(modelo));
         }
-        catch (Exception e)
-        {
-            return ResponseEntity.badRequest().body("ERROR"+ e.getMessage());
-
-         }
-
-    }
-    @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar ( @PathVariable ("id") final Long id, @RequestBody final Modelo modelo){
-        Modelo modeloBanco = this.modeloService.findByid(id);
-        modeloBanco.setMarca(modelo.getMarca());
-        modeloBanco.setNome(modelo.getNome());
-        try{
-            this.modeloService.atualizar(modeloBanco);
-            return ResponseEntity.ok("Modelo atualizado com sucesso");
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().body("ERROR");
-
+        catch (DataIntegrityViolationException e){
+            return ResponseEntity.internalServerError()
+                    .body("Error: " + e.getCause().getCause().getMessage());
         }
     }
-    @DeleteMapping
-    public ResponseEntity<?> delete(@PathVariable ("id") final Long id){
-        Modelo modeloBanco = this.modeloService.findByid(id);
 
-    try{
-             this.modeloService.delete(modeloBanco);
-             return ResponseEntity.ok("Deletado com sucesso");
+    @PutMapping("/{idModelo}")
+    public ResponseEntity<?> atualizar(
+            @PathVariable Long idModelo,
+            @RequestBody Modelo modelo
+    ) {
+        try {
+            this.modeloService.atualizar(idModelo, modelo);
+            return ResponseEntity.ok().body("Modelo atualizado com sucesso!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-    catch(Exception e){
-            return ResponseEntity.badRequest().body("ERROR");
+    }
 
+
+    @PutMapping("/desativar/{idModelo}")
+    public ResponseEntity<?> desativar(
+            @PathVariable Long idModelo
+    ){
+        try{
+            this.modeloService.desativar(idModelo);
+            return ResponseEntity.ok().body("Modelo desativado com sucesso!");
+        }catch (RuntimeException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    @PutMapping("/ativar/{idModelo}")
+    public ResponseEntity<?> ativar(
+            @PathVariable Long idModelo
+    ){
+        try{
+            this.modeloService.ativar(idModelo);
+            return ResponseEntity.ok().body("Modelo ativado com sucesso!");
+        }catch (RuntimeException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
