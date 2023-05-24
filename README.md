@@ -24,4 +24,4 @@ Esse projeto foi desenvolvido com as seguintes tecnologias:
 
 ## 💻 Projeto
 
-Foi desenvolvido um projeto Backend em Spring MVC.
+Foi desenvolvido um projeto Backend com Spring MVC.
